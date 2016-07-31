@@ -79,32 +79,9 @@ class CKI2C
     static uint8_t bufferIndex;
     static uint8_t totalBytes;
     static uint16_t timeOutDelay;
-	void ShowInterrupt();
 	void ClearInterrupt();
-	void ShowStart();
-	void Showstop();
-	void ShowCollision();
-	const int SCL1 = 38;
-	const int SDA1 = 4;
-	// const int PGD = 10;
-	// const int PGC = 11;
-	// const int J1P3 = 33; 
-	// const int J1P5 = 27; 
-	// const int J1P6 = 31; 
-	// const int J1P7 = 27; 
-	// const int J1P8 = 32; 
-	// const int J1P9 = 30; 
-	// const int J1P10 = 15;
-	// const int J1P11 = 14;
-	// const int J1P12 = 15;
-	// const int J1P13 = 7;
-	// const int J1P14 = 6;
-	// const int J1P15 = 24;
-	// const int J1P17 = 16;
-	// const int J1P18 = 29;
-	// const int J1P19 = 35;
-	// const int J1P20 = 13;	
-
+	const int SCL1 = 38; //FIXME
+	const int SDA1 = 4; //FIXME
 };
 
 extern CKI2C Wire;

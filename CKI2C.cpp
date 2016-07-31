@@ -52,8 +52,6 @@ void CKI2C::timeOut(uint16_t _timeOut)
   timeOutDelay = _timeOut;
 }
 
-
-
 //beginTransmission sends start and device address (shifted left x1, LSB = 0)
 uint8_t CKI2C::beginTransmission(uint8_t deviceAddress)
 {
@@ -87,27 +85,6 @@ uint8_t CKI2C::receive()
 	return(data[bufferIndex]);
 }
 
-  
-/*return values for new functions that use the timeOut feature 
-  will now return at what point in the transmission the timeout
-  occurred. Looking at a full communication sequence between a 
-  master and slave (transmit data and then readback data) there
-  a total of 7 points in the sequence where a timeout can occur.
-  These are listed below and correspond to the returned value:
-  1 - Waiting for successful completion of a Start bit
-  2 - Waiting for ACK/NACK while addressing slave in transmit mode (MT)
-  3 - Waiting for ACK/NACK while sending data to the slave
-  4 - Waiting for successful completion of a Repeated Start
-  5 - Waiting for ACK/NACK while addressing slave in receiver mode (MR)
-  6 - Waiting for ACK/NACK while receiving data from the slave
-  7 - Waiting for successful completion of the Stop bit
-
-  All possible return values:
-  0           Function executed with no errors
-  1 - 7       Timeout occurred, see above list
-  8 - 0xFF    See datasheet for exact meaning */ 
-
-
 /////////////////////////////////////////////////////
 uint8_t CKI2C::write(int data)
 {
@@ -132,7 +109,6 @@ uint8_t CKI2C::write(uint8_t *data, uint8_t numberBytes)
 			return(resultCode);
 		}
 	}
-	// resultCode = stop();
 	return(resultCode);
 }
 uint8_t CKI2C::endTransmission(void)
@@ -192,7 +168,6 @@ uint8_t CKI2C::requestFrom(uint8_t address, uint8_t numberBytes)
 	return(resultCode);
 }
 
-
 uint8_t CKI2C::requestFrom(uint8_t address, uint8_t numberBytes, uint8_t *dataBuffer)
 {
 	bytesAvailable = 0;
@@ -238,11 +213,7 @@ uint8_t CKI2C::requestFrom(uint8_t address, uint8_t numberBytes, uint8_t *dataBu
 	resultCode = stop();
 	return(resultCode);
 }
-
-
-
 /////////////// Private Methods ////////////////////////////////////////
-
 
 uint8_t CKI2C::start(uint16_t StartType)
 {
@@ -262,16 +233,13 @@ uint8_t CKI2C::start(uint16_t StartType)
 
 	if (STARTFLAG) //start bit detected
 	{
-		ShowStart();
 		return(0);
 	}
 	if (COLLISION) //Was there a collision?
 	{
-		ShowCollision();
 		resetBus();
 		return(2);
 	}
-	ShowCollision();
 	resetBus();	
 	return(3); //returning for some other reason	
 
@@ -301,7 +269,6 @@ uint8_t CKI2C::sendAddress(uint8_t i2cAddress)
 // it wasn't an ACK, was it a collision?
 	if (COLLISION) //Was there a collision?
 	{
-		ShowCollision(); //
 		resetBus();
 		return(2);
 	}	
@@ -331,7 +298,6 @@ uint8_t CKI2C::sendByte(uint8_t i2cData)
 // it wasn't an ACK, was it a collision?
 	if (COLLISION) //Was there a collision?
 	{
-		ShowCollision();
 		resetBus();
 		return(3);
 	}
@@ -343,7 +309,6 @@ uint8_t CKI2C::sendByte(uint8_t i2cData)
 
 uint8_t CKI2C::receiveByte(uint8_t ack)
 {
-	// digitalWrite(J1P20, LOW);
 	I2C1CONSET = bit(3); // enable receives RCEN 12	
 
 	unsigned long startingTime = millis();
@@ -379,7 +344,6 @@ uint8_t CKI2C::receiveByte(uint8_t ack)
 	ClearInterrupt();		
 	if (COLLISION) //Was there a collision?
 	{
-		ShowCollision();
 		resetBus();
 		return(12);
 	}
@@ -403,16 +367,13 @@ uint8_t CKI2C::stop()
 	ClearInterrupt();
 	if (STOPFLAG) //stop bit detected
 	{
-		Showstop();
 		return(0);
 	}
 	if (COLLISION) //Was there a collision?
 	{
-		ShowCollision();
 		resetBus();
 		return(2);
 	}
-	ShowCollision();
 	resetBus();	
 	return(1); //returning for some other reason	
 }
@@ -420,7 +381,6 @@ uint8_t CKI2C::stop()
 
 void CKI2C::resetBus()
 {
-	// digitalWrite(J1P3, HIGH);	
 	I2C1CON = 0; //Clear all bits
 	I2C1STAT = 0; 
 	pinMode(SCL1, OPEN);	
@@ -435,43 +395,12 @@ void CKI2C::resetBus()
 	ClearInterrupt();
 	delayMicroseconds(10);	
 	I2C1CONSET = bit(15); 
-	// digitalWrite(J1P3, LOW);		
 }
 void CKI2C::ClearInterrupt(void)
 {
-	ShowInterrupt();	
 	IFS1 &= ~bit(12); //Clear the interrupt
-	ShowInterrupt();
-}
-// delete the following when done
-
-void CKI2C::ShowInterrupt(void)
-{
-	if INTERRUPT 
-	{
-		// digitalWrite(J1P6, HIGH);	
-	}
-	else
-	{
-		// digitalWrite(J1P6, LOW);
-	}
 }
 
-void CKI2C::ShowStart(void)
-{
-	// digitalWrite(J1P19, HIGH);		
-	// digitalWrite(J1P19, LOW);	
-}	
-void CKI2C::Showstop(void)
-{
-	// digitalWrite(J1P14, HIGH);		
-	// digitalWrite(J1P14, LOW);	
-}	
-void CKI2C::ShowCollision(void)
-{
-	// digitalWrite(J1P20, HIGH);		
-	// digitalWrite(J1P20, LOW);	
-}
 CKI2C Wire = CKI2C();
 
 
